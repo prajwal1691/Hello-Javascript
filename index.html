@@ -1,9 +1,15 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>User Database</title>
-  </head>
-  <body>
+const express = require('express');
+const app = express();
+
+// Load user data from the database
+const users = [
+  { id: 1, name: 'John Doe', email: 'john.doe@example.com', phone: '123-456-7890' },
+  { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', phone: '987-654-3210' }
+];
+
+// Display the list of users
+app.get('/', (req, res) => {
+  res.send(`
     <h1>User Database</h1>
     <table>
       <thead>
@@ -12,22 +18,33 @@
           <th>Name</th>
           <th>Email</th>
           <th>Phone</th>
+          <th>Edit</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>1</td>
-          <td>John Doe</td>
-          <td>john.doe@example.com</td>
-          <td>123-456-7890</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Jane Smith</td>
-          <td>jane.smith@example.com</td>
-          <td>987-654-3210</td>
-        </tr>
+        ${users.map(user => `
+          <tr>
+            <td>${user.id}</td>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.phone}</td>
+            <td><a href="/edit?id=${user.id}">Edit</a></td>
+          </tr>
+        `).join('')}
       </tbody>
     </table>
-  </body>
-</html>
+  `);
+});
+
+// Display the edit form for a specific user
+app.get('/edit', (req, res) => {
+  const user = users.find(u => u.id === parseInt(req.query.id));
+  if (!user) {
+    res.status(404).send('User not found');
+    return;
+  }
+  res.send(`
+    <h1>Edit User ${user.name}</h1>
+    <form method="post">
+      <label>Name:</label>
+      <input type="text" name="name" value="${user.name}
