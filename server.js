@@ -1,5 +1,10 @@
 const http = require('http');
 const fs = require('fs');
+const MongoClient = require('mongodb').MongoClient;
+
+// Connection URL and database name
+const url = 'mongodb://admin:password@localhost:27017';
+const dbName = 'user-account';
 
 const server = http.createServer((req, res) => {
   // Read the HTML file containing the JavaScript app
@@ -16,6 +21,19 @@ const server = http.createServer((req, res) => {
 
 const port = process.env.PORT || 3000;
 
-server.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+// Connect to the MongoDB database
+MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
+  if (err) {
+    console.log(err);
+    process.exit(1);
+  }
+
+  console.log('Connected to MongoDB');
+
+  const db = client.db(dbName);
+
+  // Start the server after connecting to the database
+  server.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
 });
